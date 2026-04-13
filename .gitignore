@@ -1,0 +1,28 @@
+# env
+.env
+*.env
+
+# dependencies
+node_modules
+
+# build
+dist
+build
+
+# prisma generated client
+/generated/prisma
+
+# database (if local sqlite)
+prisma/dev.db
+
+# logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
