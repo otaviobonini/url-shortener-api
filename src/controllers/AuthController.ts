@@ -9,17 +9,23 @@ class AuthController {
       const user = await service.createUser({ username, email, password });
       return res.status(201).json(user);
     } catch (error) {
-      return res.status(400).json({ error: error });
+      if (error instanceof Error)
+        return res.status(400).json({ error: error.message });
     }
+    return res.status(400).json({ error: "Unknown error" });
   }
+
   async login(req: Request, res: Response) {
     const { email, password } = req.body;
     try {
       const user = await service.loginUser({ email, password });
       return res.status(200).json(user);
     } catch (error) {
-      return res.status(400).json({ error: error });
+      if (error instanceof Error)
+        return res.status(400).json({ error: error.message });
     }
+    return res.status(400).json({ error: "Unknown error" });
   }
 }
+
 export default new AuthController();

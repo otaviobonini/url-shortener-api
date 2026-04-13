@@ -5,8 +5,6 @@ import jwt from "jsonwebtoken";
 
 export default class AuthService {
   async createUser({ username, password, email }: CreateUser) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const existingEmail = await prisma.user.findUnique({
       where: { email },
     });
@@ -14,6 +12,8 @@ export default class AuthService {
     if (existingEmail) {
       throw new Error("Email already in use");
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
       data: {

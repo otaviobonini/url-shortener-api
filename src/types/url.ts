@@ -1,6 +1,10 @@
 export interface CreateUrl {
-  originalUrl: String;
+  originalUrl: string;
   expires: Date | null;
-  hashedUrl: String;
-  userId: Number;
+  userId: number;
+}
+
+export interface DeleteUrl {
+  userId: number;
+  urlId: number;
 }
