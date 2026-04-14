@@ -20,8 +20,8 @@ const router = Router();
 
 router.post(
   "/",
-  authMiddleware,
   limiter,
+  authMiddleware,
   validateRequest(createUrlSchema),
   UrlController.shorten,
 );

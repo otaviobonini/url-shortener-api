@@ -78,10 +78,10 @@ Authorization: Bearer <token>
 
 ### Auth
 
-| Método | Rota           | Descrição |
-| ------ | -------------- | --------- |
-| POST   | /auth/register | Cadastro  |
-| POST   | /auth/login    | Login     |
+| Método | Rota      | Descrição |
+| ------ | --------- | --------- |
+| POST   | /register | Cadastro  |
+| POST   | /login    | Login     |
 
 ### Url (protegido)
 
@@ -97,7 +97,7 @@ Authorization: Bearer <token>
 ### Criar Usuário
 
 ```bash
-curl -X POST http://localhost:3333/auth/register \
+curl -X POST http://localhost:3333/register \
 -H "Content-Type: application/json" \
 -d '{"name":"João","email":"joao@email.com","password":"123456"}'
 ```
@@ -105,7 +105,7 @@ curl -X POST http://localhost:3333/auth/register \
 ### Login
 
 ```bash
-curl -X POST http://localhost:3333/auth/login \
+curl -X POST http://localhost:3333/login \
 -H "Content-Type: application/json" \
 -d '{"email":"joao@email.com","password":"123456"}'
 ```
