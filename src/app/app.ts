@@ -16,7 +16,6 @@ app.use(express.json());
 app.use(helmet());
 
 app.use("/", limiter, authRoutes);
-
-app.use("/url", urlRoutes);
+app.use("/url", limiter, urlRoutes);
 
 export default app;

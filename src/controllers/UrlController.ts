@@ -43,7 +43,7 @@ class UrlController {
     const { page, limit } = req.query as unknown as PaginationQuery;
 
     try {
-      const urls = await service.getUserUrls(userId, page, limit);
+      const urls = await service.getUserUrls({ userId, page, limit });
       return res.status(200).json(urls);
     } catch (error) {
       if (error instanceof Error) {

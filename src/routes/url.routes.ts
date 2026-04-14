@@ -8,19 +8,11 @@ import {
   redirectUrlSchema,
   paginationQuerySchema,
 } from "../schemas/url.schema.js";
-import { rateLimit } from "express-rate-limit";
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
-  message: "Too many requests, please try again later.",
-});
 
 const router = Router();
 
 router.post(
   "/",
-  limiter,
   authMiddleware,
   validateRequest(createUrlSchema),
   UrlController.shorten,

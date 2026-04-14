@@ -8,3 +8,9 @@ export interface DeleteUrl {
   userId: number;
   urlId: number;
 }
+
+export interface GetUrl {
+  userId: number;
+  page: number;
+  limit: number;
+}

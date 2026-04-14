@@ -1,6 +1,6 @@
 import { prisma } from "../database/prisma.js";
 import { nanoid } from "nanoid";
-import { CreateUrl, DeleteUrl } from "../types/url.js";
+import { CreateUrl, DeleteUrl, GetUrl } from "../types/url.js";
 
 export default class UrlService {
   async createShortUrl({ userId, originalUrl, expires }: CreateUrl) {
@@ -35,7 +35,7 @@ export default class UrlService {
     return deletedUrl;
   }
 
-  async getUserUrls(userId: number, page: number, limit: number) {
+  async getUserUrls({ userId, page, limit }: GetUrl) {
     const urls = await prisma.url.findMany({
       where: { userId },
       take: limit,
