@@ -1,10 +1,11 @@
+import { CreateUserInput, LoginUserInput } from "../schemas/auth.schema.js";
 import AuthService from "../service/AuthService.js";
 import { Request, Response } from "express";
 const service = new AuthService();
 
 class AuthController {
   async register(req: Request, res: Response) {
-    const { username, email, password } = req.body;
+    const { username, email, password } = req.body as CreateUserInput;
     try {
       const user = await service.createUser({ username, email, password });
       return res.status(201).json(user);
@@ -16,7 +17,7 @@ class AuthController {
   }
 
   async login(req: Request, res: Response) {
-    const { email, password } = req.body;
+    const { email, password } = req.body as LoginUserInput;
     try {
       const user = await service.loginUser({ email, password });
       return res.status(200).json(user);
