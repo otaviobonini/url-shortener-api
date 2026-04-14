@@ -1,3 +1,8 @@
+import {
+  DeleteUrlInput,
+  PaginationQuery,
+  RedirectUrlInput,
+} from "../schemas/url.schema.js";
 import UrlService from "../service/UrlService.js";
 import { Request, Response } from "express";
 const service = new UrlService();
@@ -21,11 +26,10 @@ class UrlController {
   }
 
   async delete(req: Request, res: Response) {
-    const { id } = req.params as { id: string };
+    const { id } = req.params as unknown as DeleteUrlInput;
     const userId = req.userId!;
-    const urlId = parseInt(id);
     try {
-      const deleted = await service.deleteShortUrl({ userId, urlId });
+      const deleted = await service.deleteShortUrl({ userId, urlId: id });
       return res.status(200).json(deleted);
     } catch (error) {
       if (error instanceof Error)
@@ -36,14 +40,10 @@ class UrlController {
 
   async getUrls(req: Request, res: Response) {
     const userId = req.userId!;
-    const { page, limit } = req.query as { page: string; limit: string };
+    const { page, limit } = req.query as unknown as PaginationQuery;
 
     try {
-      const urls = await service.getUserUrls(
-        userId,
-        parseInt(page),
-        parseInt(limit),
-      );
+      const urls = await service.getUserUrls(userId, page, limit);
       return res.status(200).json(urls);
     } catch (error) {
       if (error instanceof Error) {
@@ -53,7 +53,7 @@ class UrlController {
     }
   }
   async redirect(req: Request, res: Response) {
-    const { hashedUrl } = req.params as { hashedUrl: string };
+    const { hashedUrl } = req.params as unknown as RedirectUrlInput;
     try {
       const url = await service.getUrlForRedirect(hashedUrl);
       return res.redirect(url.originalUrl);

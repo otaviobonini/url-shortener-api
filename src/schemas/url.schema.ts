@@ -17,3 +17,8 @@ export const paginationQuerySchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
 });
+
+export type PaginationQuery = z.infer<typeof paginationQuerySchema>;
+export type CreateUrlInput = z.infer<typeof createUrlSchema>;
+export type DeleteUrlInput = z.infer<typeof deleteUrlSchema>;
+export type RedirectUrlInput = z.infer<typeof redirectUrlSchema>;
