@@ -36,8 +36,9 @@ class UrlController {
 
   async getUrls(req: Request, res: Response) {
     const userId = req.userId!;
+    const { page, limit } = req.query as { page: string; limit: string };
     try {
-      const urls = await service.getUserUrls(userId);
+      const urls = await service.getUserUrls(userId, page, limit);
       return res.status(200).json(urls);
     } catch (error) {
       if (error instanceof Error) {

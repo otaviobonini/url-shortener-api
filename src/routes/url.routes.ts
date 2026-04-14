@@ -6,17 +6,31 @@ import {
   createUrlSchema,
   deleteUrlSchema,
   redirectUrlSchema,
+  paginationQuerySchema,
 } from "../schemas/url.schema.js";
+import { rateLimit } from "express-rate-limit";
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  message: "Too many requests, please try again later.",
+});
 
 const router = Router();
 
-(router.post(
+router.post(
   "/",
-  validateRequest(createUrlSchema),
   authMiddleware,
+  limiter,
+  validateRequest(createUrlSchema),
   UrlController.shorten,
-),
-  router.get("/", authMiddleware, UrlController.getUrls));
+);
+router.get(
+  "/",
+  validateRequest(paginationQuerySchema, "query"),
+  authMiddleware,
+  UrlController.getUrls,
+);
 router.delete(
   "/:id",
   validateRequest(deleteUrlSchema, "params"),

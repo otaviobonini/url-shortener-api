@@ -12,3 +12,8 @@ export const deleteUrlSchema = z.object({
 export const redirectUrlSchema = z.object({
   hashedUrl: z.string().length(8, "Short URL must be 8 characters long"),
 });
+
+export const paginationQuerySchema = z.object({
+  page: z.number().min(1).default(1),
+  limit: z.number().min(1).max(100).default(10),
+});
