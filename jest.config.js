@@ -2,20 +2,23 @@ import { createDefaultPreset } from "ts-jest";
 
 const tsJestTransformCfg = createDefaultPreset().transform;
 
-/** @type {import("jest").Config} **/
+/** @type {import("jest").Config} */
 export default {
+  preset: "ts-jest/presets/default-esm",
   testEnvironment: "node",
+
+  extensionsToTreatAsEsm: [".ts"],
+
+  moduleNameMapper: {
+  "^(\\.{1,2}/.*)\\.js$": "$1",
+},
   transform: {
-    "^.+\\.tsx?$": [
+    "^.+\\.ts$": [
       "ts-jest",
       {
-        // Aponta para o tsconfig específico de testes
+        useESM: true,
         tsconfig: "./tsconfig.test.json",
       },
     ],
-  },
-  moduleNameMapper: {
-    // Remove o .js dos imports para o Jest conseguir resolver
-    "^(\\.{1,2}/.*)\\.js$": "$1",
   },
 };

@@ -3,7 +3,7 @@ import {
   PaginationQuery,
   RedirectUrlInput,
 } from "../schemas/url.schema.js";
-import UrlService from "../service/UrlService.js";
+import UrlService from "../services/UrlService.js";
 import { Request, Response } from "express";
 const service = new UrlService();
 

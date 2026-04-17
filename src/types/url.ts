@@ -14,3 +14,13 @@ export interface GetUrl {
   page?: number;
   limit?: number;
 }
+
+export interface UrlModel {
+  id: number;
+  originalUrl: string;
+  counter: number;
+  expires: Date | null;
+  createdAt: Date;
+  hashedUrl: string;
+  userId: number;
+}

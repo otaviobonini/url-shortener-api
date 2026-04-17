@@ -1,5 +1,5 @@
 import { CreateUserInput, LoginUserInput } from "../schemas/auth.schema.js";
-import AuthService from "../service/AuthService.js";
+import AuthService from "../services/AuthService.js";
 import { Request, Response } from "express";
 const service = new AuthService();
 
