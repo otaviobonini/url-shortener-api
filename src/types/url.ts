@@ -11,6 +11,6 @@ export interface DeleteUrl {
 
 export interface GetUrl {
   userId: number;
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
 }

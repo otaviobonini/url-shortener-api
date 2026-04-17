@@ -6,6 +6,16 @@ const tsJestTransformCfg = createDefaultPreset().transform;
 export default {
   testEnvironment: "node",
   transform: {
-    ...tsJestTransformCfg,
+    "^.+\\.tsx?$": [
+      "ts-jest",
+      {
+        // Aponta para o tsconfig específico de testes
+        tsconfig: "./tsconfig.test.json",
+      },
+    ],
+  },
+  moduleNameMapper: {
+    // Remove o .js dos imports para o Jest conseguir resolver
+    "^(\\.{1,2}/.*)\\.js$": "$1",
   },
 };

@@ -35,7 +35,7 @@ export default class UrlService {
     return deletedUrl;
   }
 
-  async getUserUrls({ userId, page, limit }: GetUrl) {
+  async getUserUrls({ userId, page = 1, limit = 10 }: GetUrl) {
     const urls = await prisma.url.findMany({
       where: { userId },
       take: limit,
