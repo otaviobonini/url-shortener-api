@@ -9,6 +9,7 @@ Esta API foi desenvolvida com foco em boas práticas de arquitetura backend, inc
 - Separação de responsabilidades (Controller → Service → Database)
 - Validação robusta com Zod
 - Autenticação segura com JWT
+- Testes com Jest
 - Persistência com Prisma ORM
 
 ## Tecnologias utilizadas
@@ -21,6 +22,7 @@ Esta API foi desenvolvida com foco em boas práticas de arquitetura backend, inc
 - JWT (JSON Web Token)
 - bcrypt
 - Zod
+- Jest
 
 ## Configuração do ambiente
 
@@ -125,3 +127,7 @@ curl -X POST http://localhost:3333/url \
 npm run dev    # Desenvolvimento
 npm start      # Produção
 ```
+
+## Testes
+
+Use npm run tests para rodar os testes em seu terminal
