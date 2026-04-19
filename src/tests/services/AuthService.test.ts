@@ -66,7 +66,7 @@ describe("--AuthService tests--", () => {
     const result = service.loginUser(LoginUserInput);
     await expect(result).rejects.toThrow("Invalid email or password");
   });
-  test("Should fail if password doesnt exists", async () => {
+  test("Should fail if user doesnt exists", async () => {
     prismaMock.findUnique.mockResolvedValue(null);
     const result = service.loginUser(LoginUserInput);
     await expect(result).rejects.toThrow("Invalid email or password");

@@ -1,13 +1,14 @@
 import { CreateUserInput, LoginUserInput } from "../schemas/auth.schema.js";
 import AuthService from "../services/AuthService.js";
 import { Request, Response } from "express";
-const service = new AuthService();
 
 class AuthController {
+  constructor(private service: AuthService) {}
+
   async register(req: Request, res: Response) {
     const { username, email, password } = req.body as CreateUserInput;
     try {
-      const user = await service.createUser({ username, email, password });
+      const user = await this.service.createUser({ username, email, password });
       return res.status(201).json(user);
     } catch (error) {
       if (error instanceof Error)
@@ -19,7 +20,7 @@ class AuthController {
   async login(req: Request, res: Response) {
     const { email, password } = req.body as LoginUserInput;
     try {
-      const user = await service.loginUser({ email, password });
+      const user = await this.service.loginUser({ email, password });
       return res.status(200).json(user);
     } catch (error) {
       if (error instanceof Error)
@@ -29,4 +30,4 @@ class AuthController {
   }
 }
 
-export default new AuthController();
+export default new AuthController(new AuthService());

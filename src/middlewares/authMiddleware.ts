@@ -16,7 +16,10 @@ export const authMiddleware = (
     return res.status(401).json({ error: "Missing token" });
   }
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    if (!process.env.JWT_SECRET) {
+      throw new Error("Undefined JWT_SECRET");
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
     req.userId = decoded.id;
     next();
   } catch (error) {

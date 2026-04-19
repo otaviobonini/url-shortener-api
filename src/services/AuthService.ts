@@ -45,7 +45,10 @@ export default class AuthService {
     if (!isPasswordValid) {
       throw new Error("Invalid email or password");
     }
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, {
+    if (!process.env.JWT_SECRET) {
+      throw new Error("Undefined JWT_SECRET");
+    }
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
     return {
