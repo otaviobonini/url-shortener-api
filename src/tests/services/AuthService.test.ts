@@ -30,6 +30,7 @@ describe("--AuthService tests--", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     service = new AuthService();
+    process.env.JWT_SECRET = "test-secret";
   });
   test("Should create new user", async () => {
     prismaMock.findUnique.mockResolvedValue(null);
@@ -51,6 +52,7 @@ describe("--AuthService tests--", () => {
   test("Should login sucessfully", async () => {
     prismaMock.findUnique.mockResolvedValue(FakeUserInfo);
     bcryptMock.compare.mockResolvedValue(true as never);
+
     jwtMock.sign.mockReturnValue("token" as never);
     const result = await service.loginUser(LoginUserInput);
     expect(result).toEqual({

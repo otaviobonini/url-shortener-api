@@ -17,26 +17,26 @@ router.post(
   UrlLimiter,
   authMiddleware,
   validateRequest(createUrlSchema),
-  UrlController.shorten,
+  UrlController.shorten.bind(UrlController),
 );
 router.get(
   "/",
   UrlLimiter,
   validateRequest(paginationQuerySchema, "query"),
   authMiddleware,
-  UrlController.getUrls,
+  UrlController.getUrls.bind(UrlController),
 );
 router.delete(
   "/:id",
   UrlLimiter,
   validateRequest(deleteUrlSchema, "params"),
   authMiddleware,
-  UrlController.delete,
+  UrlController.delete.bind(UrlController),
 );
 router.get(
   "/:hashedUrl",
   validateRequest(redirectUrlSchema, "params"),
-  UrlController.redirect,
+  UrlController.redirect.bind(UrlController),
 );
 
 export default router;

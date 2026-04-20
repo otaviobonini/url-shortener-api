@@ -1,4 +1,5 @@
 import { describe, it, expect, jest, test } from "@jest/globals";
+import { Prisma } from "@prisma/client";
 
 jest.mock("../../database/prisma.js");
 jest.mock("nanoid", () => ({
@@ -29,13 +30,19 @@ describe("--Url Service test--", () => {
     const result = await service.createShortUrl(FakeUrl);
     expect(result).toEqual(FakeUrl);
   });
-  test("Should create a new url if collision is detected", async () => {
-    prismaMock.findUnique.mockResolvedValueOnce(FakeUrl);
-    prismaMock.findUnique.mockResolvedValueOnce(null);
-    prismaMock.create.mockResolvedValue(FakeUrlCollision);
-    const result = await service.createShortUrl(FakeUrlCollision);
-    expect(result).not.toBe(FakeUrl);
+  test("Should retry on P2002 collision", async () => {
+    const p2002 = new Prisma.PrismaClientKnownRequestError(
+      "Unique constraint failed",
+      { code: "P2002", clientVersion: "5.0.0" },
+    );
+    prismaMock.create
+      .mockRejectedValueOnce(p2002) // 1ª tentativa: colisão
+      .mockResolvedValueOnce(FakeUrl); // 2ª tentativa: sucesso
+    const result = await service.createShortUrl(FakeUrl);
+    expect(result).toEqual(FakeUrl);
+    expect(prismaMock.create).toHaveBeenCalledTimes(2);
   });
+
   test("Should delete url", async () => {
     prismaMock.findUnique.mockResolvedValue(FakeUrl);
     prismaMock.delete.mockResolvedValue(FakeUrl);
