@@ -30,16 +30,13 @@ export const prismaErrorHandler = (
     err instanceof Prisma.PrismaClientKnownRequestError &&
     err.code === "P2002"
   ) {
-    throw new AppError(
-      400,
-      "Unique constraint failed: A record with this value already exists",
-    );
+    return next(new AppError(400, "Unique constraint failed..."));
   }
   if (
     err instanceof Prisma.PrismaClientKnownRequestError &&
     err.code === "P2025"
   ) {
-    throw new AppError(404, "Record not found");
+    return next(new AppError(404, "Record not found"));
   }
   return next(err);
 };

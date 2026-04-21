@@ -2,6 +2,7 @@ import { prisma } from "../database/prisma.js";
 import { Prisma } from "@prisma/client";
 import { nanoid } from "nanoid";
 import { CreateUrl, DeleteUrl, GetUrl } from "../types/url.js";
+import { AppError } from "../common/AppError.js";
 
 export default class UrlService {
   async createShortUrl({ userId, originalUrl, expires }: CreateUrl) {
@@ -20,19 +21,22 @@ export default class UrlService {
           //Se a url ja existe no banco, tentamos denovo gerar a url em até 5 tentativas.
           continue;
         }
-        throw new Error("Failed to create URL");
+        throw new AppError(500, "Failed to create URL");
       }
     }
-    throw new Error("Failed to generate unique URL after multiple attempts");
+    throw new AppError(
+      500,
+      "Failed to generate unique URL after multiple attempts",
+    );
   }
 
   async deleteShortUrl({ userId, urlId }: DeleteUrl) {
     const url = await prisma.url.findUnique({ where: { id: urlId } });
     if (!url) {
-      throw new Error("URL not found or Unauthorized");
+      throw new AppError(403, "URL not found or Unauthorized");
     }
     if (url.userId !== userId) {
-      throw new Error("URL not found or Unauthorized");
+      throw new AppError(403, "URL not found or Unauthorized");
     }
     const deletedUrl = await prisma.url.delete({ where: { id: urlId } });
     return deletedUrl;
@@ -52,7 +56,7 @@ export default class UrlService {
       where: { hashedUrl },
     });
     if (!existingUrl) {
-      throw new Error("URL not found");
+      throw new AppError(404, "URL not found");
     }
 
     const isExpired = existingUrl.expires && existingUrl.expires < new Date();
@@ -61,7 +65,7 @@ export default class UrlService {
       await prisma.url.delete({
         where: { hashedUrl },
       });
-      throw new Error("URL has expired and has been deleted");
+      throw new AppError(410, "URL has expired and has been deleted");
     }
 
     const url = await prisma.url.update({

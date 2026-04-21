@@ -1,3 +1,4 @@
+import { AppError } from "../common/AppError.js";
 import { prisma } from "../database/prisma.js";
 import { CreateUser, LoginUser } from "../types/user.js";
 import bcrypt from "bcrypt";
@@ -10,7 +11,7 @@ export default class AuthService {
     });
 
     if (existingEmail) {
-      throw new Error("Email already in use");
+      throw new AppError(409, "Email already in use");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -39,14 +40,14 @@ export default class AuthService {
       },
     });
     if (!user) {
-      throw new Error("Invalid email or password");
+      throw new AppError(401, "Invalid email or password");
     }
     const isPasswordValid = await bcrypt.compare(password, user.hashedPassword);
     if (!isPasswordValid) {
-      throw new Error("Invalid email or password");
+      throw new AppError(401, "Invalid email or password");
     }
     if (!process.env.JWT_SECRET) {
-      throw new Error("Undefined JWT_SECRET");
+      throw new AppError(500, "Undefined JWT_SECRET");
     }
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
