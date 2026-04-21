@@ -5,11 +5,11 @@ import {
   RedirectUrlInput,
 } from "../schemas/url.schema.js";
 import UrlService from "../services/UrlService.js";
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
 class UrlController {
   constructor(private service: UrlService) {}
-  async shorten(req: Request, res: Response, next: NextFunction) {
+  async shorten(req: Request, res: Response) {
     const { url, expires } = req.body;
     if (!req.userId) {
       throw new AppError(401, "Unauthorized");
@@ -24,7 +24,7 @@ class UrlController {
     res.status(201).json(shortUrl);
   }
 
-  async delete(req: Request, res: Response, next: NextFunction) {
+  async delete(req: Request, res: Response) {
     const { id } = req.params as DeleteUrlInput;
     if (!req.userId) {
       throw new AppError(401, "Unauthorized");
@@ -35,7 +35,7 @@ class UrlController {
     return res.status(200).json(deleted);
   }
 
-  async getUrls(req: Request, res: Response, next: NextFunction) {
+  async getUrls(req: Request, res: Response) {
     if (!req.userId) {
       throw new AppError(401, "Unauthorized");
     }
@@ -46,7 +46,7 @@ class UrlController {
     return res.status(200).json(urls);
   }
 
-  async redirect(req: Request, res: Response, next: NextFunction) {
+  async redirect(req: Request, res: Response) {
     const { hashedUrl } = req.params as RedirectUrlInput;
     const url = await this.service.getUrlForRedirect(hashedUrl);
     return res.redirect(url.originalUrl);
