@@ -10,7 +10,11 @@ export const validateRequest = (
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = schema.parse(req[option]);
-      req[option] = data;
+      Object.defineProperty(req, option, {
+        value: data,
+        writable: true,
+        configurable: true,
+      });
       return next();
     } catch (error) {
       if (error instanceof ZodError) {

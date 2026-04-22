@@ -2,7 +2,7 @@ import request from "supertest";
 import app from "../../app/app.js";
 import { prisma } from "../../database/prisma.js";
 
-import { FakeUrl } from "../factories/UrlFactory.js";
+import { FakeUrl, FakeUrlList } from "../factories/UrlFactory.js";
 
 jest.mock("../../database/prisma.js");
 jest.mock("nanoid", () => ({
@@ -11,7 +11,7 @@ jest.mock("nanoid", () => ({
 
 jest.mock("../../middlewares/authMiddleware.js", () => ({
   authMiddleware: (req: any, res: any, next: any) => {
-    req.user = { id: 1 };
+    req.userId = 1;
     next();
   },
 }));
@@ -23,11 +23,11 @@ describe("POST /url", () => {
     jest.clearAllMocks();
   });
 
-  test("deve retornar 400 para body inválido", async () => {
+  test("should return 400 for invalid body", async () => {
     const res = await request(app).post("/url").send({ url: "not-a-url" });
     expect(res.status).toBe(400);
   });
-  test("deve retornar 201 para URL válida", async () => {
+  test("should return 201 for valid URL", async () => {
     prismaMock.findUnique.mockResolvedValue(null); // URL não existe
     prismaMock.create.mockResolvedValue(FakeUrl);
     const res = await request(app)
@@ -35,6 +35,58 @@ describe("POST /url", () => {
       .send({ url: "https://example.com" });
 
     expect(res.status).toBe(201);
-    expect(res.body).toEqual(FakeUrl);
+    expect(res.body).toEqual({
+      ...FakeUrl,
+      createdAt: FakeUrl.createdAt.toISOString(),
+    });
+  });
+  test("should return 500 if an unexpected error occurs", async () => {
+    prismaMock.create.mockRejectedValue(new Error("Database error"));
+    const res = await request(app)
+      .post("/url")
+      .send({ url: "https://example.com" });
+    expect(res.status).toBe(500);
+    expect(res.body).toEqual({ error: "Failed to create URL" });
+  });
+});
+
+describe("GET /url", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  test("should return 200 and list of URLs", async () => {
+    prismaMock.findMany.mockResolvedValue(FakeUrlList);
+    const res = await request(app).get("/url");
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(
+      FakeUrlList.map((url) => ({
+        ...url,
+        createdAt: url.createdAt.toISOString(),
+      })),
+    );
+  });
+});
+
+describe("DELETE /url/:id", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  test("should delete url and return 200  ", async () => {
+    prismaMock.deleteMany.mockResolvedValue({ count: 1 });
+    const res = await request(app).delete("/url/1");
+    expect(res.status).toBe(200);
+  });
+});
+
+describe("GET /url/:hashedUrl", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  test("should redirect url and return 200", async () => {
+    prismaMock.findUnique.mockResolvedValue(FakeUrl);
+    const res = await request(app).get(`/url/${FakeUrl.hashedUrl}`);
+    console.log(res.body);
+    expect(res.status).toBe(200);
+    expect(res.headers.location).toContain(FakeUrl.originalUrl);
   });
 });
