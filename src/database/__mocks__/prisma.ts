@@ -11,5 +11,6 @@ export const prisma = {
     delete: jest.fn(),
     update: jest.fn(),
     findMany: jest.fn(),
+    deleteMany: jest.fn(),
   },
 };

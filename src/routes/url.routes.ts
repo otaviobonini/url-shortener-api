@@ -35,6 +35,7 @@ router.delete(
 );
 router.get(
   "/:hashedUrl",
+  UrlLimiter,
   validateRequest(redirectUrlSchema, "params"),
   UrlController.redirect.bind(UrlController),
 );

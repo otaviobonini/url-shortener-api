@@ -44,21 +44,13 @@ describe("--Url Service test--", () => {
   });
 
   test("Should delete url", async () => {
-    prismaMock.findUnique.mockResolvedValue(FakeUrl);
-    prismaMock.delete.mockResolvedValue(FakeUrl);
+    prismaMock.deleteMany.mockResolvedValue({ count: 1 });
     const result = await service.deleteShortUrl({ userId: 1, urlId: 1 });
-    expect(result).toBe(FakeUrl);
+    expect(result).toEqual({ count: 1 });
   });
-  test("Should fail to delete url if userID different", async () => {
-    prismaMock.findUnique.mockResolvedValue(FakeUrl);
-    prismaMock.delete.mockResolvedValue(FakeUrl);
+  test("Should fail to delete url if url not found or wrong user", async () => {
+    prismaMock.deleteMany.mockResolvedValue({ count: 0 });
     const result = service.deleteShortUrl({ userId: 2, urlId: 1 });
-    await expect(result).rejects.toThrow("URL not found or Unauthorized");
-  });
-  test("Should fail to delete if url dont exist", async () => {
-    prismaMock.findUnique.mockResolvedValue(null);
-    prismaMock.delete.mockResolvedValue(FakeUrl);
-    const result = service.deleteShortUrl({ userId: 1, urlId: 1 });
     await expect(result).rejects.toThrow("URL not found or Unauthorized");
   });
   test("Should get user URLS", async () => {
