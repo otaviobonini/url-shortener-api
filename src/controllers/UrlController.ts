@@ -25,7 +25,7 @@ class UrlController {
   }
 
   async delete(req: Request, res: Response) {
-    const { id } = req.params as DeleteUrlInput;
+    const { id } = req.params as unknown as DeleteUrlInput;
     if (!req.userId) {
       throw new AppError(401, "Unauthorized");
     }
@@ -40,7 +40,7 @@ class UrlController {
       throw new AppError(401, "Unauthorized");
     }
     const userId = req.userId;
-    const { page, limit } = req.query as PaginationQuery;
+    const { page, limit } = req.query as unknown as PaginationQuery;
 
     const urls = await this.service.getUserUrls({ userId, page, limit });
     return res.status(200).json(urls);

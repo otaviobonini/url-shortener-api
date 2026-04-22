@@ -21,14 +21,14 @@ describe("POST /register", () => {
     jest.clearAllMocks();
   });
 
-  test("deve retornar 400 para body inválido", async () => {
+  test("should return 400 for invalid body", async () => {
     const res = await request(app)
       .post("/register")
       .send({ email: "nao-é-email", password: "123" });
     expect(res.status).toBe(400);
   });
 
-  test("deve retornar 201 para registro válido", async () => {
+  test("should return 201 for valid registration", async () => {
     prismaMock.findUnique.mockResolvedValue(null); // email não existe
     prismaMock.create.mockResolvedValue({
       // usuário criado
@@ -51,7 +51,7 @@ describe("POST /register", () => {
     });
   });
 
-  test("deve retornar 409 se email já existe", async () => {
+  test("should return 409 if email already exists", async () => {
     prismaMock.findUnique.mockResolvedValue({
       id: 1,
       email: "a@b.com",
@@ -68,14 +68,14 @@ describe("POST /register", () => {
 });
 
 describe("POST /login", () => {
-  test("deve retornar 400 para body inválido", async () => {
+  test("should return 400 for invalid body", async () => {
     const res = await request(app)
       .post("/login")
       .send({ email: "nao-é-email", password: "123" });
     expect(res.status).toBe(400);
   });
-  test("deve retornar 200 para login válido", async () => {
-    bcryptMock.compare.mockResolvedValue(true);
+  test("should return 200 for valid login", async () => {
+    bcryptMock.compare.mockResolvedValue(true as never);
     prismaMock.findUnique.mockResolvedValue({
       id: 1,
       email: "teste@gmail.com",
@@ -88,8 +88,8 @@ describe("POST /login", () => {
 
     expect(res.status).toBe(200);
   });
-  test("deve retornar 401 para email não existente", async () => {
-    bcryptMock.compare.mockResolvedValue(true);
+  test("should return 401 for non-existent email", async () => {
+    bcryptMock.compare.mockResolvedValue(true as never);
     prismaMock.findUnique.mockResolvedValue(null);
     const res = await request(app)
       .post("/login")
@@ -98,7 +98,7 @@ describe("POST /login", () => {
     expect(res.status).toBe(401);
   });
   test("deve retornar 401 para senha incorreta", async () => {
-    bcryptMock.compare.mockResolvedValue(false);
+    bcryptMock.compare.mockResolvedValue(false as never);
     prismaMock.findUnique.mockResolvedValue({
       id: 1,
       email: "teste@gmail.com",

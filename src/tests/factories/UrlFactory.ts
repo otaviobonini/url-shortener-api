@@ -3,7 +3,7 @@ import { UrlModel } from "../../types/url.js";
 export const FakeUrl: UrlModel = {
   id: 1,
   originalUrl: "https://example.com",
-  hashedUrl: "12345678",
+  hashedUrl: "abc12345",
   counter: 0,
   createdAt: new Date(),
   expires: null,
@@ -13,7 +13,7 @@ export const FakeUrl: UrlModel = {
 export const FakeUrlIncrement: UrlModel = {
   id: 1,
   originalUrl: "https://example.com",
-  hashedUrl: "abc123",
+  hashedUrl: "abc12345",
   counter: 1,
   createdAt: new Date(),
   expires: null,
@@ -23,7 +23,7 @@ export const FakeUrlIncrement: UrlModel = {
 export const FakeUrlCollision: UrlModel = {
   id: 1,
   originalUrl: "https://example.com",
-  hashedUrl: "def123",
+  hashedUrl: "def12345",
   counter: 0,
   createdAt: new Date(),
   expires: null,
@@ -33,7 +33,7 @@ export const FakeUrlCollision: UrlModel = {
 export const FakeUrlExpired: UrlModel = {
   id: 1,
   originalUrl: "https://example.com",
-  hashedUrl: "abc123",
+  hashedUrl: "abc12345",
   counter: 0,
   createdAt: new Date("2019-01-01"),
   expires: new Date("2020-01-01"),
@@ -44,7 +44,7 @@ export const FakeUrlList: UrlModel[] = [
   {
     id: 1,
     originalUrl: "https://example.com",
-    hashedUrl: "abc123",
+    hashedUrl: "abc12345",
     counter: 0,
     createdAt: new Date(),
     expires: null,
@@ -53,7 +53,7 @@ export const FakeUrlList: UrlModel[] = [
   {
     id: 2,
     originalUrl: "https://example2.com",
-    hashedUrl: "def123",
+    hashedUrl: "def12345",
     counter: 0,
     createdAt: new Date(),
     expires: null,
@@ -62,7 +62,7 @@ export const FakeUrlList: UrlModel[] = [
   {
     id: 3,
     originalUrl: "https://example3.com",
-    hashedUrl: "ghi123",
+    hashedUrl: "ghi12345",
     counter: 0,
     createdAt: new Date(),
     expires: null,
