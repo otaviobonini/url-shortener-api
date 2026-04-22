@@ -2,7 +2,11 @@ import request from "supertest";
 import app from "../../app/app.js";
 import { prisma } from "../../database/prisma.js";
 
-import { FakeUrl, FakeUrlList } from "../factories/UrlFactory.js";
+import {
+  FakeUrl,
+  FakeUrlList,
+  FakeUrlExpired,
+} from "../factories/UrlFactory.js";
 
 jest.mock("../../database/prisma.js");
 jest.mock("nanoid", () => ({
@@ -76,17 +80,33 @@ describe("DELETE /url/:id", () => {
     const res = await request(app).delete("/url/1");
     expect(res.status).toBe(200);
   });
+  test("should return 403 if url not found", async () => {
+    prismaMock.deleteMany.mockResolvedValue({ count: 0 });
+    const res = await request(app).delete("/url/1");
+    expect(res.status).toBe(403);
+  });
 });
 
 describe("GET /url/:hashedUrl", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  test("should redirect url and return 200", async () => {
+  test("should redirect url and return 302", async () => {
     prismaMock.findUnique.mockResolvedValue(FakeUrl);
+    prismaMock.update.mockResolvedValue({ ...FakeUrl, counter: 1 });
     const res = await request(app).get(`/url/${FakeUrl.hashedUrl}`);
-    console.log(res.body);
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(302);
     expect(res.headers.location).toContain(FakeUrl.originalUrl);
+  });
+  test("should delete expired url and return 410 ", async () => {
+    prismaMock.findUnique.mockResolvedValue(FakeUrlExpired);
+    prismaMock.delete.mockResolvedValue(FakeUrlExpired);
+    const res = await request(app).get(`/url/${FakeUrl.hashedUrl}`);
+    expect(res.status).toBe(410);
+  });
+  test("should return 404 if url not found", async () => {
+    prismaMock.findUnique.mockResolvedValue(null);
+    const res = await request(app).get(`/url/${FakeUrl.hashedUrl}`);
+    expect(res.status).toBe(404);
   });
 });
