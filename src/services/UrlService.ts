@@ -31,15 +31,11 @@ export default class UrlService {
   }
 
   async deleteShortUrl({ userId, urlId }: DeleteUrl) {
-    const url = await prisma.url.findUnique({ where: { id: urlId } });
-    if (!url) {
+    const url = await prisma.url.deleteMany({ where: { id: urlId, userId } });
+    if (url.count === 0) {
       throw new AppError(403, "URL not found or Unauthorized");
     }
-    if (url.userId !== userId) {
-      throw new AppError(403, "URL not found or Unauthorized");
-    }
-    const deletedUrl = await prisma.url.delete({ where: { id: urlId } });
-    return deletedUrl;
+    return url;
   }
 
   async getUserUrls({ userId, page = 1, limit = 10 }: GetUrl) {
