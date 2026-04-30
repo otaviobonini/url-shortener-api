@@ -3,6 +3,7 @@ import { prisma } from "../database/prisma.js";
 import { CreateUser, LoginUser } from "../types/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { env } from "../schemas/env.schema.js";
 
 export default class AuthService {
   async createUser({ username, password, email }: CreateUser) {
@@ -46,10 +47,8 @@ export default class AuthService {
     if (!isPasswordValid) {
       throw new AppError(401, "Invalid email or password");
     }
-    if (!process.env.JWT_SECRET) {
-      throw new AppError(500, "Undefined JWT_SECRET");
-    }
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+
+    const token = jwt.sign({ id: user.id }, env.JWT_SECRET, {
       expiresIn: "7d",
     });
     return {

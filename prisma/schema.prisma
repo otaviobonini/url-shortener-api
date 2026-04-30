@@ -33,4 +33,7 @@ model Url {
   userId Int
   
   user User @relation(onDelete: Cascade, references: [id], fields: [userId])
+
+  @@index([userId, createdAt])
+  @@index([expires])
 }

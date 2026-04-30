@@ -18,7 +18,7 @@ export default class UrlService {
           error instanceof Prisma.PrismaClientKnownRequestError &&
           error.code === "P2002"
         ) {
-          //Se a url ja existe no banco, tentamos denovo gerar a url em até 5 tentativas.
+          //If url already exists in the database we retry to create the url in 5 attempts.
           continue;
         }
         throw new AppError(500, "Failed to create URL");

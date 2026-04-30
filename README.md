@@ -40,21 +40,34 @@ npm install
 
 ### 3. Configure o ambiente
 
-Crie um arquivo `.env` na raiz do projeto:
+Copie o arquivo de exemplo:
+
+```bash
+cp .env.example .env
+```
+
+Ou crie manualmente um arquivo `.env` na raiz do projeto:
 
 ```env
 DATABASE_URL="postgresql://usuario:senha@localhost:5432/url_shortener"
 JWT_SECRET="sua_chave_secreta"
 PORT=3333
+NODE_ENV=development
 ```
 
-### 4. Execute as migrations
+### 4. Subir banco com Docker
+
+```bash
+docker compose up -d
+```
+
+### 5. Execute as migrations
 
 ```bash
 npx prisma migrate deploy
 ```
 
-### 5. Inicie o servidor
+### 6. Inicie o servidor
 
 ```bash
 npm run dev
@@ -64,6 +77,13 @@ Servidor disponível em:
 
 ```
 http://localhost:3333
+```
+
+### Rodando em produção
+
+```bash
+npm run build
+node dist/app.js
 ```
 
 ## Autenticação
@@ -118,7 +138,7 @@ curl -X POST http://localhost:3333/login \
 curl -X POST http://localhost:3333/url \
 -H "Authorization: Bearer SEU_TOKEN" \
 -H "Content-Type: application/json" \
--d '{  "url": "https://google.com", "expires": "2026-12-31T23:59:59.000Z"  }'
+-d '{ "url": "https://google.com", "expires": "2026-12-31T23:59:59.000Z" }'
 ```
 
 ## Scripts
@@ -130,4 +150,4 @@ npm start      # Produção
 
 ## Testes
 
-Use npm run tests para rodar os testes em seu terminal
+Use npm test para rodar os testes em seu terminal
