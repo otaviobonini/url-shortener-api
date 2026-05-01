@@ -54,6 +54,10 @@ export default class UrlService {
     if (!existingUrl) {
       throw new AppError(404, "URL not found");
     }
+    const { protocol } = new URL(existingUrl.originalUrl);
+    if (!["http:", "https:"].includes(protocol)) {
+      throw new AppError(400, "Invalid URL protocol");
+    }
 
     const isExpired = existingUrl.expires && existingUrl.expires < new Date();
 

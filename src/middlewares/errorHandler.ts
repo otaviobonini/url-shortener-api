@@ -15,7 +15,7 @@ export const errorHandler = (
   }
   console.error(err);
   return res.status(500).json({
-    error: "Internal server error ",
+    error: "Internal server error",
   });
 };
 
@@ -29,7 +29,7 @@ export const prismaErrorHandler = (
     err instanceof Prisma.PrismaClientKnownRequestError &&
     err.code === "P2002"
   ) {
-    return next(new AppError(400, "Unique constraint failed..."));
+    return next(new AppError(400, "Unique constraint failed"));
   }
   if (
     err instanceof Prisma.PrismaClientKnownRequestError &&
