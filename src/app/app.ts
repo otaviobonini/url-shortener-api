@@ -7,9 +7,14 @@ import {
   errorHandler,
   prismaErrorHandler,
 } from "../middlewares/errorHandler.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "../config/swagger.js";
+import cors from "cors";
 
 const app = express();
+app.use(cors());
 
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express.json());
 app.use(helmet());
 
