@@ -3,5 +3,10 @@
   "compilerOptions": {
     "types": ["node"]
   },
-  "exclude": ["src/tests", "**/*.test.ts", "jest.config.js"]
+  "exclude": [
+    "src/tests",
+    "src/database/__mocks__",
+    "**/*.test.ts",
+    "jest.config.js"
+  ]
 }
