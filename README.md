@@ -24,6 +24,17 @@ Esta API foi desenvolvida com foco em boas práticas de arquitetura backend, inc
 - Zod
 - Jest
 
+## Documentação da API
+
+A documentação interativa está disponível via Swagger:
+
+- Local: http://localhost:3333/docs
+- Produção: https://url-shortener-api-1-dbal.onrender.com/docs
+
+> Nota: O endpoint de redirecionamento (`GET /url/:hashedUrl`) retorna um HTTP 302.  
+> Esse comportamento não pode ser totalmente testado no Swagger UI devido a limitações do navegador.  
+> Para testar corretamente, abra a URL encurtada diretamente no navegador.
+
 ## Configuração do ambiente
 
 ### 1. Clone o repositório

@@ -139,6 +139,10 @@ export const urlDocs = {
   "/url/{hashedUrl}": {
     get: {
       summary: "Redirect to the original URL",
+      description:
+        "This endpoint returns an HTTP 302 redirect to the original URL. " +
+        "The redirection cannot be viewed directly in Swagger UI due to browser limitations (CORS). " +
+        "To test it, open the generated short URL directly in your browser.",
       tags: ["Redirect"],
       parameters: [
         {
