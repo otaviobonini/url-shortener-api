@@ -36,3 +36,23 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t url-shortener-api:ci .
+
+  deploy:
+    # só roda se a CI passar, e só em push ou pull_request na main 
+    needs: continuous-integration
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' | 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy na EC2 via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: url-api.otaviobonini.dev
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/url-shortener-api
+            git pull --ff-only
+            docker compose -f docker-compose.prod.yml up -d --build
+            docker image prune -f
