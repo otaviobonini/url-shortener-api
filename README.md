@@ -31,7 +31,7 @@ A documentação interativa está disponível via Swagger:
 - Local: http://localhost:3333/docs
 - Produção: https://url-shortener-api-1-dbal.onrender.com/docs
 
-> Nota: O endpoint de redirecionamento (`GET /url/:hashedUrl`) retorna um HTTP 302.  
+> Nota: O endpoint de redirecionamento (`GET /:hashedUrl`) retorna um HTTP 302.  
 > Esse comportamento não pode ser totalmente testado no Swagger UI devido a limitações do navegador.  
 > Para testar corretamente, abra a URL encurtada diretamente no navegador.
 
@@ -94,51 +94,60 @@ http://localhost:3333
 
 ```bash
 npm run build
-node dist/app.js
+npm start
 ```
 
 ## Autenticação
 
-A API utiliza JWT.
+A API utiliza JWT com refresh token.
 
-Após login, utilize o token no header:
+- O **access token** (curta duração) é retornado no corpo da resposta do login e deve ser enviado no header:
 
 ```
 Authorization: Bearer <token>
 ```
 
+- O **refresh token** é entregue em um cookie `httpOnly` (não acessível via JS) e usado para renovar o access token em `POST /auth/refresh`. O `POST /auth/logout` revoga esse refresh token.
+
 ## Endpoints
 
 ### Auth
 
-| Método | Rota      | Descrição |
-| ------ | --------- | --------- |
-| POST   | /register | Cadastro  |
-| POST   | /login    | Login     |
+| Método | Rota           | Descrição                                  |
+| ------ | -------------- | ------------------------------------------ |
+| POST   | /auth/register | Cadastro                                   |
+| POST   | /auth/login    | Login (retorna access token + cookie)      |
+| POST   | /auth/refresh  | Renova o access token via cookie           |
+| POST   | /auth/logout   | Revoga o refresh token e limpa o cookie    |
 
 ### Url (protegido)
 
-| Método | Rota            | Descrição                           |
-| ------ | --------------- | ----------------------------------- |
-| GET    | /url            | Listar as urls do usuários          |
-| GET    | /url/:hashedUrl | Redirecionar usuário à url original |
-| POST   | /url            | Criar url                           |
-| DELETE | /url/:id        | Deletar url                         |
+| Método | Rota     | Descrição                  |
+| ------ | -------- | -------------------------- |
+| GET    | /url     | Listar as urls do usuário  |
+| POST   | /url     | Criar url                  |
+| DELETE | /url/:id | Deletar url                |
+
+### Redirect (público)
+
+| Método | Rota         | Descrição                                    |
+| ------ | ------------ | -------------------------------------------- |
+| GET    | /:hashedUrl  | Redireciona (302) para a url original curta  |
 
 ## Exemplos de uso
 
 ### Criar Usuário
 
 ```bash
-curl -X POST http://localhost:3333/register \
+curl -X POST http://localhost:3333/auth/register \
 -H "Content-Type: application/json" \
--d '{"name":"João","email":"joao@email.com","password":"123456"}'
+-d '{"username":"João","email":"joao@email.com","password":"123456"}'
 ```
 
 ### Login
 
 ```bash
-curl -X POST http://localhost:3333/login \
+curl -X POST http://localhost:3333/auth/login \
 -H "Content-Type: application/json" \
 -d '{"email":"joao@email.com","password":"123456"}'
 ```
