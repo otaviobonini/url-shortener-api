@@ -20,8 +20,20 @@ model User {
   username String 
   hashedPassword String
   urls Url[]
+  tokens RefreshToken[]
 }
 
+
+model RefreshToken {
+  id Int @id @default(autoincrement())
+  hashedToken String @unique
+  userId Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(onDelete: Cascade, fields: [userId], references: [id])
+  
+  @@index([userId, createdAt])
+}
 
 model Url {
   id Int @id @default(autoincrement())
