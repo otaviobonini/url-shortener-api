@@ -136,7 +136,7 @@ export const urlDocs = {
       },
     },
   },
-  "/url/{hashedUrl}": {
+  "/{hashedUrl}": {
     get: {
       summary: "Redirect to the original URL",
       description:

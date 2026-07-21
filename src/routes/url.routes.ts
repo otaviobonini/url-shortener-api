@@ -5,7 +5,6 @@ import { authMiddleware } from "../middlewares/authMiddleware.js";
 import {
   createUrlSchema,
   deleteUrlSchema,
-  redirectUrlSchema,
   paginationQuerySchema,
 } from "../schemas/url.schema.js";
 import { UrlLimiter } from "../utils/rateLimit.js";
@@ -22,22 +21,16 @@ router.post(
 router.get(
   "/",
   UrlLimiter,
-  validateRequest(paginationQuerySchema, "query"),
   authMiddleware,
+  validateRequest(paginationQuerySchema, "query"),
   UrlController.getUrls.bind(UrlController),
 );
 router.delete(
   "/:id",
   UrlLimiter,
-  validateRequest(deleteUrlSchema, "params"),
   authMiddleware,
+  validateRequest(deleteUrlSchema, "params"),
   UrlController.delete.bind(UrlController),
-);
-router.get(
-  "/:hashedUrl",
-  UrlLimiter,
-  validateRequest(redirectUrlSchema, "params"),
-  UrlController.redirect.bind(UrlController),
 );
 
 export default router;
