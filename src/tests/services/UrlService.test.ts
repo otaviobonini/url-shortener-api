@@ -14,6 +14,7 @@ import {
   FakeUrlCollision,
   FakeUrlExpired,
   FakeUrlIncrement,
+  FakeUrlList,
 } from "../factories/UrlFactory.js";
 
 const prismaMock = prisma.url as jest.Mocked<typeof prisma.url>;
@@ -54,10 +55,26 @@ describe("--Url Service test--", () => {
     const result = service.deleteShortUrl({ userId: 2, urlId: 1 });
     await expect(result).rejects.toThrow("URL not found or Unauthorized");
   });
-  test("Should get user URLS", async () => {
-    prismaMock.findMany.mockResolvedValue([]);
+  test("Should get user URLS with pagination metadata", async () => {
+    prismaMock.findMany.mockResolvedValue(FakeUrlList);
+    prismaMock.count.mockResolvedValue(42);
     const result = await service.getUserUrls({ userId: 1 });
-    expect(result).toEqual([]);
+    // total comes from count(), not from the page size — 42 records, 10 per page
+    expect(result).toEqual({
+      data: FakeUrlList,
+      page: 1,
+      limit: 10,
+      total: 42,
+    });
+  });
+  test("Should count using the same filter as the page query", async () => {
+    prismaMock.findMany.mockResolvedValue(FakeUrlList);
+    prismaMock.count.mockResolvedValue(3);
+    await service.getUserUrls({ userId: 7, page: 2, limit: 5 });
+    expect(prismaMock.count).toHaveBeenCalledWith({ where: { userId: 7 } });
+    expect(prismaMock.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { userId: 7 }, take: 5, skip: 5 }),
+    );
   });
   test("Should get url for redirect and increment counter", async () => {
     prismaMock.findUnique.mockResolvedValue(FakeUrl);

@@ -61,16 +61,18 @@ describe("GET /url", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  test("should return 200 and list of URLs", async () => {
+  test("should return 200 with paginated URLs", async () => {
     prismaMock.findMany.mockResolvedValue(FakeUrlList);
+    prismaMock.count.mockResolvedValue(3);
     const res = await request(app).get("/url");
     expect(res.status).toBe(200);
-    expect(res.body).toEqual(
+    expect(res.body.data).toEqual(
       FakeUrlList.map((url) => ({
         ...url,
         createdAt: url.createdAt.toISOString(),
       })),
     );
+    expect(res.body).toMatchObject({ page: 1, limit: 10, total: 3 });
   });
 });
 

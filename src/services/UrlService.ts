@@ -39,13 +39,19 @@ export default class UrlService {
   }
 
   async getUserUrls({ userId, page = 1, limit = 10 }: GetUrl) {
-    const urls = await prisma.url.findMany({
-      where: { userId },
-      take: limit,
-      skip: (page - 1) * limit,
-      orderBy: { createdAt: "desc" },
-    });
-    return urls;
+    const where = { userId };
+
+    const [data, total] = await Promise.all([
+      prisma.url.findMany({
+        where,
+        take: limit,
+        skip: (page - 1) * limit,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.url.count({ where }),
+    ]);
+
+    return { data, page, limit, total };
   }
   async getUrlForRedirect(hashedUrl: string) {
     const existingUrl = await prisma.url.findUnique({

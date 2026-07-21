@@ -18,5 +18,6 @@ export const prisma = {
     update: jest.fn(),
     findMany: jest.fn(),
     deleteMany: jest.fn(),
+    count: jest.fn(),
   },
 };

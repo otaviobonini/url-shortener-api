@@ -77,7 +77,7 @@ export const urlDocs = {
       ],
       responses: {
         200: {
-          description: "List of URLs",
+          description: "Paginated list of URLs",
           content: {
             "application/json": {
               schema: {
@@ -94,6 +94,7 @@ export const urlDocs = {
                           type: "string",
                           example: "https://github.com/otaviobonini",
                         },
+                        counter: { type: "integer", example: 0 },
                         expires: {
                           type: "string",
                           format: "date-time",
@@ -102,6 +103,22 @@ export const urlDocs = {
                         createdAt: { type: "string", format: "date-time" },
                       },
                     },
+                  },
+                  page: {
+                    type: "integer",
+                    example: 1,
+                    description: "Current page",
+                  },
+                  limit: {
+                    type: "integer",
+                    example: 10,
+                    description: "Items per page",
+                  },
+                  total: {
+                    type: "integer",
+                    example: 42,
+                    description:
+                      "Total records matching the filter, across all pages",
                   },
                 },
               },
