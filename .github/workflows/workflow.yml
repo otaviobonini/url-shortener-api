@@ -35,4 +35,4 @@ jobs:
         run: npm test
 
       - name: Build Docker image
-        run: docker build -t ecommerce-api:ci .
+        run: docker build -t url-shortener-api:ci .

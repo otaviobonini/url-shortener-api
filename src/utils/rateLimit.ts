@@ -22,9 +22,9 @@ export const AuthLimiter = rateLimit({
 });
 
 export const UrlLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000,
+  windowMs: 1 * 60 * 1000,
   store: createRedisStore("rl:url"),
-  max: 50,
+  max: 1000, // 1000 requests per 1 minute
   handler: (req, res) => {
     res.status(429).json({
       message: "Muitas tentativas de acesso ao URL. Tente novamente em alguns minutos.",
