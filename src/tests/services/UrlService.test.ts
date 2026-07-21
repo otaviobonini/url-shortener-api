@@ -7,6 +7,7 @@ jest.mock("nanoid", () => ({
   nanoid: () => "abc123",
 }));
 
+import { redis } from "../../database/redis.js";
 import { prisma } from "../../database/prisma.js";
 import UrlService from "../../services/UrlService.js";
 import {
@@ -18,6 +19,7 @@ import {
 } from "../factories/UrlFactory.js";
 
 const prismaMock = prisma.url as jest.Mocked<typeof prisma.url>;
+const redisMock = redis as jest.Mocked<typeof redis>;
 
 describe("--Url Service test--", () => {
   let service: UrlService;
@@ -46,6 +48,15 @@ describe("--Url Service test--", () => {
   });
 
   test("Should delete url", async () => {
+    prismaMock.findFirst.mockResolvedValue({
+      hashedUrl: "abc123",
+      id: 0,
+      userId: 0,
+      originalUrl: "",
+      counter: 0,
+      expires: null,
+      createdAt: new Date(),
+    });
     prismaMock.deleteMany.mockResolvedValue({ count: 1 });
     const result = await service.deleteShortUrl({ userId: 1, urlId: 1 });
     expect(result).toEqual({ count: 1 });
@@ -87,6 +98,87 @@ describe("--Url Service test--", () => {
     const result = service.getUrlForRedirect("abc123");
     await expect(result).rejects.toThrow("URL not found");
   });
+  test("Cache hit should serve the redirect without touching the database", async () => {
+    redisMock.get.mockResolvedValue(
+      JSON.stringify({ originalUrl: FakeUrl.originalUrl, expires: null }),
+    );
+    prismaMock.update.mockResolvedValue(FakeUrlIncrement);
+
+    const result = await service.getUrlForRedirect(FakeUrl.hashedUrl);
+
+    expect(result).toEqual({ originalUrl: FakeUrl.originalUrl });
+    expect(prismaMock.findUnique).not.toHaveBeenCalled();
+  });
+
+  test("Cache hit should still count the click", async () => {
+    redisMock.get.mockResolvedValue(
+      JSON.stringify({ originalUrl: FakeUrl.originalUrl, expires: null }),
+    );
+    prismaMock.update.mockResolvedValue(FakeUrlIncrement);
+
+    await service.getUrlForRedirect(FakeUrl.hashedUrl);
+
+    expect(prismaMock.update).toHaveBeenCalledWith({
+      where: { hashedUrl: FakeUrl.hashedUrl },
+      data: { counter: { increment: 1 } },
+    });
+  });
+
+  test("Cache hit should still redirect if the counter update fails", async () => {
+    // the counter update is fire-and-forget; without a .catch() a failure here
+    // becomes an unhandled rejection and kills the process on Node 18+
+    redisMock.get.mockResolvedValue(
+      JSON.stringify({ originalUrl: FakeUrl.originalUrl, expires: null }),
+    );
+    prismaMock.update.mockRejectedValue(new Error("record not found"));
+
+    await expect(
+      service.getUrlForRedirect(FakeUrl.hashedUrl),
+    ).resolves.toEqual({ originalUrl: FakeUrl.originalUrl });
+  });
+
+  test("Should fall back to the database when redis is down", async () => {
+    redisMock.get.mockRejectedValue(new Error("ECONNREFUSED"));
+    prismaMock.findUnique.mockResolvedValue(FakeUrl);
+    prismaMock.update.mockResolvedValue(FakeUrlIncrement);
+
+    const result = await service.getUrlForRedirect(FakeUrl.hashedUrl);
+
+    expect(result).toEqual(FakeUrlIncrement);
+  });
+
+  test("Cache miss should populate the cache with a TTL", async () => {
+    redisMock.get.mockResolvedValue(null);
+    prismaMock.findUnique.mockResolvedValue(FakeUrl);
+    prismaMock.update.mockResolvedValue(FakeUrlIncrement);
+
+    await service.getUrlForRedirect(FakeUrl.hashedUrl);
+
+    expect(redisMock.set).toHaveBeenCalledWith(
+      `url:${FakeUrl.hashedUrl}`,
+      expect.any(String),
+      expect.any(String),
+      expect.any(Number),
+    );
+  });
+
+  test("Deleting a url should invalidate its cache entry", async () => {
+    prismaMock.findFirst.mockResolvedValue({
+      hashedUrl: FakeUrl.hashedUrl,
+      originalUrl: "",
+      id: 0,
+      counter: 0,
+      expires: null,
+      createdAt: new Date(),
+      userId: 0
+    });
+    prismaMock.deleteMany.mockResolvedValue({ count: 1 });
+
+    await service.deleteShortUrl({ userId: 1, urlId: 1 });
+
+    expect(redisMock.del).toHaveBeenCalledWith(`url:${FakeUrl.hashedUrl}`);
+  });
+
   test("Should fail and delete if url expired", async () => {
     prismaMock.findUnique.mockResolvedValue(FakeUrlExpired);
     prismaMock.delete.mockResolvedValue(FakeUrlExpired);

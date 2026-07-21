@@ -13,6 +13,7 @@ export const prisma = {
   },
   url: {
     findUnique: jest.fn(),
+    findFirst: jest.fn(),
     create: jest.fn(),
     delete: jest.fn(),
     update: jest.fn(),

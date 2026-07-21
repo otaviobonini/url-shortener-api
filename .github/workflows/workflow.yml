@@ -38,9 +38,9 @@ jobs:
         run: docker build -t url-shortener-api:ci .
 
   deploy:
-    # só roda se a CI passar, e só em push ou pull_request na main 
+    # Only deploy when the CI job passes, on the main branch, and on push events to main (not PRs)
     needs: continuous-integration
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push' | 'pull_request'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
@@ -55,4 +55,6 @@ jobs:
             cd ~/url-shortener-api
             git pull --ff-only
             docker compose -f docker-compose.prod.yml up -d --build
+            sleep 10
+            curl -fsS localhost:5001/health
             docker image prune -f
