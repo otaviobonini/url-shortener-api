@@ -20,6 +20,8 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 RUN npx prisma generate
 
+COPY entrypoint.sh ./
+RUN chmod +x entrypoint.sh
 
 EXPOSE 5001
 USER node
@@ -30,4 +32,5 @@ HEALTHCHECK --interval=30s --retries=3 \
 
 
 
+ENTRYPOINT ["./entrypoint.sh"]
 CMD ["node", "dist/app/server.js"]

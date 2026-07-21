@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    env_file:
+      - .env
+    # exposto só no loopback: o Caddy (fora do compose) faz TLS e proxy reverso.
+    # 5001 para não colidir com a 5000 que o e-commerce já usa na mesma EC2.
+    ports:
+      - "127.0.0.1:5001:5001"
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    # sem "ports": só o app alcança, pela rede interna do compose.
+    # Teto de memória obrigatório: a EC2 é t4g.micro (1 GB) e divide RAM com o
+    # e-commerce. Os dados aqui (rate limit e cache) são descartáveis, então
+    # allkeys-lru simplesmente descarta o menos usado quando encher.
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    restart: unless-stopped
