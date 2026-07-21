@@ -33,6 +33,7 @@ model RefreshToken {
   user      User     @relation(onDelete: Cascade, fields: [userId], references: [id])
   
   @@index([userId, createdAt])
+  @@index([expiresAt])
 }
 
 model Url {

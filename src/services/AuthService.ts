@@ -115,4 +115,10 @@ export default class AuthService {
   },
 });
   }
+ async purgeExpiredRefreshTokens(): Promise<number> {
+  const { count } = await prisma.refreshToken.deleteMany({
+    where: { expiresAt: { lt: new Date() } },
+  });
+  return count;
+}
 }
