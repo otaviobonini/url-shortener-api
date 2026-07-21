@@ -1,6 +1,7 @@
 import request from "supertest";
 import app from "../../app/app.js";
 import { prisma } from "../../database/prisma.js";
+import { jest, describe, beforeEach, test, expect } from "@jest/globals";
 
 import {
   FakeUrl,
@@ -8,7 +9,9 @@ import {
   FakeUrlExpired,
 } from "../factories/UrlFactory.js";
 
+jest.mock("../../database/redis.js");
 jest.mock("../../database/prisma.js");
+jest.mock("../../utils/rateLimit.js");
 jest.mock("nanoid", () => ({
   nanoid: () => "abc12345",
 }));
@@ -87,26 +90,26 @@ describe("DELETE /url/:id", () => {
   });
 });
 
-describe("GET /url/:hashedUrl", () => {
+describe("GET /:hashedUrl", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
   test("should redirect url and return 302", async () => {
     prismaMock.findUnique.mockResolvedValue(FakeUrl);
     prismaMock.update.mockResolvedValue({ ...FakeUrl, counter: 1 });
-    const res = await request(app).get(`/url/${FakeUrl.hashedUrl}`);
+    const res = await request(app).get(`/${FakeUrl.hashedUrl}`);
     expect(res.status).toBe(302);
     expect(res.headers.location).toContain(FakeUrl.originalUrl);
   });
   test("should delete expired url and return 410 ", async () => {
     prismaMock.findUnique.mockResolvedValue(FakeUrlExpired);
     prismaMock.delete.mockResolvedValue(FakeUrlExpired);
-    const res = await request(app).get(`/url/${FakeUrl.hashedUrl}`);
+    const res = await request(app).get(`/${FakeUrl.hashedUrl}`);
     expect(res.status).toBe(410);
   });
   test("should return 404 if url not found", async () => {
     prismaMock.findUnique.mockResolvedValue(null);
-    const res = await request(app).get(`/url/${FakeUrl.hashedUrl}`);
+    const res = await request(app).get(`/${FakeUrl.hashedUrl}`);
     expect(res.status).toBe(404);
   });
 });

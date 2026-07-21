@@ -5,6 +5,12 @@ export const prisma = {
     findUnique: jest.fn(),
     create: jest.fn(),
   },
+  refreshToken: {
+    create: jest.fn(),
+    findUnique: jest.fn(),
+    delete: jest.fn(),
+    deleteMany: jest.fn(),
+  },
   url: {
     findUnique: jest.fn(),
     create: jest.fn(),

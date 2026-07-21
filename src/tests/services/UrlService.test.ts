@@ -1,6 +1,7 @@
-import { describe, it, expect, jest, test } from "@jest/globals";
+import { describe, it, expect, jest, test,beforeEach } from "@jest/globals";
 import { Prisma } from "@prisma/client";
 
+jest.mock("../../database/redis.js");
 jest.mock("../../database/prisma.js");
 jest.mock("nanoid", () => ({
   nanoid: () => "abc123",

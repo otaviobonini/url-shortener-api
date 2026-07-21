@@ -1,6 +1,7 @@
-import { describe, it, expect, jest, test } from "@jest/globals";
+import { describe, it, expect, jest, test, beforeEach } from "@jest/globals";
 
 jest.mock("../../database/prisma.js");
+jest.mock("../../database/redis.js");
 
 jest.mock("bcrypt", () => ({
   hash: jest.fn(),
@@ -23,6 +24,9 @@ import {
 
 const jwtMock = jwt as jest.Mocked<typeof jwt>;
 const prismaMock = prisma.user as jest.Mocked<typeof prisma.user>;
+const refreshTokenMock = prisma.refreshToken as jest.Mocked<
+  typeof prisma.refreshToken
+>;
 const bcryptMock = bcrypt as jest.Mocked<typeof bcrypt>;
 
 describe("--AuthService tests--", () => {
@@ -52,15 +56,17 @@ describe("--AuthService tests--", () => {
   test("Should login sucessfully", async () => {
     prismaMock.findUnique.mockResolvedValue(FakeUserInfo);
     bcryptMock.compare.mockResolvedValue(true as never);
+    refreshTokenMock.create.mockResolvedValue({} as never);
 
     jwtMock.sign.mockReturnValue("token" as never);
     const result = await service.loginUser(LoginUserInput);
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       id: FakeUserInfo.id,
       email: FakeUserInfo.email,
       username: FakeUserInfo.username,
       token: "token",
     });
+    expect(typeof result.refreshToken).toBe("string");
   });
   test("Should fail login if password incorrect", async () => {
     prismaMock.findUnique.mockResolvedValue(FakeUserInfo);
