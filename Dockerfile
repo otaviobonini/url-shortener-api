@@ -28,7 +28,7 @@ USER node
 
 
 HEALTHCHECK --interval=30s --retries=3 \
- CMD node -e 'fetch("http://localhost:5001/health").then(res => { if (res.status !== 200) process.exit(1) }).catch(() => process.exit(1))'
+ CMD node -e 'fetch("http://localhost:5001/live").then(res => { if (res.status !== 200) process.exit(1) }).catch(() => process.exit(1))'
 
 
 

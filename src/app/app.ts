@@ -23,6 +23,9 @@ app.use(cors({
 }));
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Liveness sem tocar no banco: o HEALTHCHECK do Docker bate aqui a cada 30s,
+// e consultar o Postgres nessa frequência impede o Neon de escalar a zero.
+app.get("/live", (_req, res) => res.status(200).json({ status: "ok" }));
 app.get("/health", healthCheck);
 app.use(express.json());
 app.use(helmet());
