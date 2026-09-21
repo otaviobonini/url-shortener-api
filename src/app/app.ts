@@ -13,7 +13,10 @@ import { swaggerSpec } from "../config/swagger.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { env } from "../schemas/env.schema.js";
-import { healthCheck } from "../controllers/HealthController.js";
+import {
+  healthCheck,
+  liveness,
+} from "../controllers/HealthController.js";
 
 const app = express();
 app.set("trust proxy", 1); // trust first proxy
@@ -23,9 +26,10 @@ app.use(cors({
 }));
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-// Liveness sem tocar no banco: o HEALTHCHECK do Docker bate aqui a cada 30s,
-// e consultar o Postgres nessa frequência impede o Neon de escalar a zero.
-app.get("/live", (_req, res) => res.status(200).json({ status: "ok" }));
+// Liveness sem tocar no banco: é aqui que o HEALTHCHECK do Docker bate em
+// loop. Consultar o Postgres nessa frequência impede o banco de escalar a
+// zero e consome a cota mensal de compute sem ninguém usar a API.
+app.get("/live", liveness);
 app.get("/health", healthCheck);
 app.use(express.json());
 app.use(helmet());
